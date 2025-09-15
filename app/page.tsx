@@ -2,32 +2,46 @@
 
 import { useState } from "react";
 
+// Define the shape of a message
 type Msg = { role: "user" | "assistant"; content: string };
 
 export default function ChatPage() {
-  // ✅ Explicitly type the state as Msg[]
+  // ✅ Messages are always an array of Msg
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
 
   async function send() {
     if (!input.trim()) return;
 
-    // ✅ Build strongly-typed message objects
+    // ✅ Build the user message explicitly typed
     const userMsg: Msg = { role: "user", content: input };
     const next: Msg[] = [...messages, userMsg];
 
     setMessages(next);
     setInput("");
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: next }),
-    });
-    const data = await res.json();
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: next }),
+      });
+      const data = await res.json();
 
-    const botMsg: Msg = { role: "assistant", content: data.reply ?? "" };
-    setMessages([...next, botMsg]);
+      const botMsg: Msg = {
+        role: "assistant",
+        content: data.reply ?? "(no reply)",
+      };
+
+      setMessages([...next, botMsg]);
+    } catch (err) {
+      console.error("Chat error:", err);
+      const errMsg: Msg = {
+        role: "assistant",
+        content: "⚠️ Sorry, something went wrong.",
+      };
+      setMessages([...next, errMsg]);
+    }
   }
 
   return (
@@ -50,7 +64,10 @@ export default function ChatPage() {
           placeholder="Ask anything…"
           onKeyDown={(e) => e.key === "Enter" && send()}
         />
-        <button onClick={send} className="px-4 py-2 rounded bg-black text-white">
+        <button
+          onClick={send}
+          className="px-4 py-2 rounded bg-black text-white"
+        >
           Send
         </button>
       </div>
