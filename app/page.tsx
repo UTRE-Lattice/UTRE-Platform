@@ -5,12 +5,14 @@ import { useState } from "react";
 type Msg = { role: "user" | "assistant"; content: string };
 
 export default function ChatPage() {
+  // ✅ Explicitly type the state as Msg[]
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
 
   async function send() {
     if (!input.trim()) return;
 
+    // ✅ Build strongly-typed message objects
     const userMsg: Msg = { role: "user", content: input };
     const next: Msg[] = [...messages, userMsg];
 
