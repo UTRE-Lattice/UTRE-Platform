@@ -5,14 +5,12 @@ import { useState } from "react";
 type Msg = { role: "user" | "assistant"; content: string };
 
 export default function ChatPage() {
-  // ✅ Make sure the state is typed as Msg[]
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
 
   async function send() {
     if (!input.trim()) return;
 
-    // ✅ Ensure the literal type is preserved
     const userMsg: Msg = { role: "user", content: input };
     const next: Msg[] = [...messages, userMsg];
 
@@ -33,6 +31,7 @@ export default function ChatPage() {
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-3">
       <h1 className="text-2xl font-bold">Seer Stone — Chat</h1>
+
       <div className="border rounded p-3 h-[60vh] overflow-y-auto">
         {messages.map((m, i) => (
           <div key={i} className="mb-2">
@@ -40,6 +39,7 @@ export default function ChatPage() {
           </div>
         ))}
       </div>
+
       <div className="flex gap-2">
         <input
           className="flex-1 border rounded p-2"
